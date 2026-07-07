@@ -1,0 +1,239 @@
+{
+  "$comment": "Mint on the Avenue — Phase 1 seed for salon-platform. Shapes match spec §6 (SalonEntity/StylistEntity/ServiceEntity). REAL DATA ONLY — every section cites its live source. Retrieved 2026-07-07 by Vex from mintontheavenue.com (livecrawl) + Google Places API.",
+  "retrievedAt": "2026-07-07",
+  "sources": {
+    "homepage": "https://mintontheavenue.com/",
+    "contact": "https://mintontheavenue.com/contact/",
+    "servicesIndex": "https://mintontheavenue.com/services/",
+    "hairDesign": "https://mintontheavenue.com/services/hair-design/",
+    "hairColor": "https://mintontheavenue.com/services/hair-color/",
+    "hairCondition": "https://mintontheavenue.com/services/hair-condition/",
+    "mintMen": "https://mintontheavenue.com/services/mint-men/",
+    "texture": "https://mintontheavenue.com/services/texture/",
+    "specialty": "https://mintontheavenue.com/services/specialty/",
+    "newGuestSpecial": "https://mintontheavenue.com/services/new-guest-special/",
+    "referrals": "https://mintontheavenue.com/services/referrals/",
+    "requestAppointment": "https://mintontheavenue.com/request-appointment/",
+    "blogAvedaWinterPark": "https://mintontheavenue.com/aveda-salon-winter-park/",
+    "meetTheTeam": "https://mintontheavenue.com/about/meet-the-team/",
+    "googlePlaces": "Google Places API, place_id ChIJQfwznhBw54gRZHRHaFdWJxA"
+  },
+
+  "salon": {
+    "identityType": "salon",
+    "handle": "mint-on-the-avenue",
+    "displayName": "Mint on the Avenue",
+    "status": "draft",
+    "entity": {
+      "nap": {
+        "name": "Mint on the Avenue",
+        "street": "228 N Park Ave",
+        "city": "Winter Park",
+        "region": "FL",
+        "postal": "32789",
+        "country": "US",
+        "phone": "+1-407-645-2264"
+      },
+      "textLine": "833-390-0226",
+      "email": "mintontheavenue@gmail.com",
+      "geo": { "lat": 28.5992879, "lng": -81.3509096 },
+      "hours": [
+        { "day": "Sunday",    "note": "By appointment only" },
+        { "day": "Monday",    "note": "By appointment only" },
+        { "day": "Tuesday",   "open": "09:00", "close": "20:00" },
+        { "day": "Wednesday", "open": "09:00", "close": "20:00" },
+        { "day": "Thursday",  "open": "09:00", "close": "20:00" },
+        { "day": "Friday",    "open": "09:00", "close": "20:00" },
+        { "day": "Saturday",  "open": "09:00", "close": "18:00" }
+      ],
+      "priceRange": "$$-$$$",
+      "bookingPlatform": "Phorest",
+      "bookingUrl": "TO_CONFIRM — 'Book Now via Phorest' target URL not captured from static HTML",
+      "gbp": {
+        "listedName": "Mint On The Avenue Aveda Salon",
+        "placeId": "ChIJQfwznhBw54gRZHRHaFdWJxA",
+        "mapsUrl": "https://maps.google.com/?cid=1163993962110219364",
+        "rating": 4.6,
+        "reviewCount": 196,
+        "categories": ["hair_salon", "beauty_salon", "hair_care"]
+      },
+      "brands": ["Aveda"],
+      "designations": ["Aveda Concept Salon", "family-owned and operated"],
+      "locationNotes": "On Park Avenue — near Briar Patch, next to Tabla, in the hallway behind Reynolds Jewelers, by the koi fish ponds",
+      "cityId": "winter-park",
+      "positioning": {
+        "tagline": "A space defined by restraint, craft, and lived-in luxury.",
+        "heroLine": "A family-owned and operated Aveda salon on Park Avenue — celebrating five years of devoted color and master cutting.",
+        "philosophy": "Every detail is a deliberate choice. We believe in the power of less, executed perfectly. Our botanical Aveda approach to color and cutting is designed to enhance, not mask, your natural texture.",
+        "retail": "Complete Aveda collection — pure-fume aromas and botanical formulas"
+      },
+      "serviceInclusions": "Every hair service includes a consultation and Aveda Moment of Wellness (neck & shoulder massage) plus basic styling; color services add shampoo/conditioning, hand massage, and blow-dry. Complimentary Aveda Ritual choice (neck/shoulder massage, hand massage, or sensory journey) per request-appointment page.",
+      "stylistLevels": "Level 1 through Level 8 artists — all prices are starting rates varying by length, texture, and artist level"
+    }
+  },
+
+  "owners": {
+    "source": "blogAvedaWinterPark",
+    "text": "The salon is owned and operated by Marisa and Mark Evans alongside the Mint team."
+  },
+
+  "team": [
+    { "name": "Mark Evans",   "title": "General Manager / Owner",             "roles": ["general-manager"], "owner": true,  "isProvider": false, "source": "Mark, 2026-07-07 (canonical roster)" },
+    { "name": "Marisa Evans", "title": "Color Director / Owner",              "roles": ["color-director"],  "owner": true,  "isProvider": true,  "bio": "Marisa works in dimension — placing light where it lives naturally, pulling warmth from the undertone, building color that photographs like sunlight.", "bioSource": "homepage", "source": "Mark, 2026-07-07 (canonical roster)" },
+    { "name": "Sonia Taylor", "title": "Master Stylist / Master Colorist",    "roles": ["master-stylist", "master-colorist"], "owner": false, "isProvider": true, "bio": "Fifteen years of mastery. Sonia reads texture, bone structure, and what you have not yet said — then gives you the version of yourself you forgot was possible.", "bioSource": "homepage", "source": "Mark, 2026-07-07 (canonical roster)" },
+    { "name": "Maribel",      "title": "Master Stylist",                      "roles": ["master-stylist"],  "owner": false, "isProvider": true,  "bio": "Maribel's highlights catch light the way a Venetian painting does — warmth, depth, a luminosity that feels earned rather than applied.", "bioSource": "homepage", "source": "Mark, 2026-07-07 (canonical roster)" },
+    { "name": "Ashley",       "title": "Junior Stylist",                      "roles": ["junior-stylist"],  "owner": false, "isProvider": true,  "source": "Mark, 2026-07-07 (canonical roster)" },
+    { "name": "Lian Ortiz",   "title": "Assistant",                           "roles": ["assistant"],       "owner": false, "isProvider": false, "source": "Mark, 2026-07-07 (canonical roster)" },
+    { "name": "Samantha Herrman", "title": "Nail Technician",                 "roles": ["nail-technician"], "owner": false, "isProvider": true,  "source": "Mark, 2026-07-07 (canonical roster)", "note": "Nail services not on the crawled site menu — menu addition to confirm" }
+  ],
+  "$teamNote": "Canonical roster from Mark 2026-07-07. Titles are free-form DATA (any salon's taxonomy fits — see salon.template.json); optional 'level' int can map members onto the salon's own pricing tiers (Mint: Level 1-8). Maribel spelling confirmed (new-guest page 'Marabel' is the typo).",
+
+  "services": {
+    "$note": "Prices are STARTING RATES in USD, ranging Level 1 → Level 8 artists. '+' preserved from site. Source per category.",
+    "hairDesign": {
+      "source": "hairDesign",
+      "items": [
+        { "name": "Bang Trim", "price": "15-35+", "group": "Dry Cuts" },
+        { "name": "Beard & Neck Trim", "price": "25-50+", "group": "Dry Cuts" },
+        { "name": "Cut — Short", "price": "30-55+", "group": "Dry Cuts" },
+        { "name": "Cut — Medium", "price": "35-60+", "group": "Dry Cuts" },
+        { "name": "Cut — Long", "price": "40-65+", "group": "Dry Cuts" },
+        { "name": "Cut — Extra Long", "price": "45-70+", "group": "Dry Cuts" },
+        { "name": "Cut — Short", "price": "40-105+", "group": "Haircut and Blow Dry" },
+        { "name": "Cut — Medium", "price": "45-105+", "group": "Haircut and Blow Dry" },
+        { "name": "Cut — Long", "price": "50-110+", "group": "Haircut and Blow Dry" },
+        { "name": "Cut — Extra Long", "price": "55-115+", "group": "Haircut and Blow Dry" },
+        { "name": "Shampoo & Blow-dry — Short", "price": "30-70+", "group": "Shampoo and Blow-dry" },
+        { "name": "Shampoo & Blow-dry — Medium", "price": "30-70+", "group": "Shampoo and Blow-dry" },
+        { "name": "Shampoo & Blow-dry — Long", "price": "40-80+", "group": "Shampoo and Blow-dry" },
+        { "name": "Shampoo & Blow-dry — Extra Long", "price": "40-80+", "group": "Shampoo and Blow-dry" },
+        { "name": "Upstyle — Short to Medium", "price": "80-200+", "group": "Special Occasion Hair" },
+        { "name": "Upstyle — Long to Extra Long", "price": "100-220+", "group": "Special Occasion Hair" },
+        { "name": "Children (Under 10) — Cut", "price": "30-50+", "group": "Children" },
+        { "name": "Children (Under 10) — Cut with Shampoo", "price": "40-70+", "group": "Children" },
+        { "name": "Blowout with Hair Extensions", "price": "50-70+", "group": "Styling add-ons" },
+        { "name": "Iron Work — Short", "price": "30-50+", "group": "Styling add-ons" },
+        { "name": "Iron Work — Medium", "price": "35-55+", "group": "Styling add-ons" },
+        { "name": "Iron Work — Long", "price": "40-60+", "group": "Styling add-ons" },
+        { "name": "Iron Work — Extra Long", "price": "45-65+", "group": "Styling add-ons" },
+        { "name": "Roller Set", "price": "60+", "group": "Styling add-ons" }
+      ]
+    },
+    "hairColor": {
+      "source": "hairColor",
+      "items": [
+        { "name": "Single Process", "price": "65-90+", "note": "New growth only", "group": "Color" },
+        { "name": "Color Balance — Short (60g)", "price": "80-110+", "group": "Color" },
+        { "name": "Color Balance — Medium (80g)", "price": "90-120+", "group": "Color" },
+        { "name": "Color Balance — Long (120g)", "price": "100-130+", "group": "Color" },
+        { "name": "Color Balance — Extra Long", "price": "120-200+", "group": "Color" },
+        { "name": "Color Cleanse Enlightener", "price": "100-140+", "group": "Color" },
+        { "name": "Enlightener Retouch", "price": "100-140+", "group": "Color" },
+        { "name": "Extended Enlightener Retouch", "price": "150-190+", "note": "Retouches 6+ weeks", "group": "Color" },
+        { "name": "Add-On Accent Highlight", "price": "60-100+", "group": "Highlights" },
+        { "name": "Partial Highlight", "price": "100-150+", "group": "Highlights" },
+        { "name": "Half Highlight", "price": "130-180+", "group": "Highlights" },
+        { "name": "Full Highlight", "price": "160-210+", "group": "Highlights" },
+        { "name": "Creative or Corrective Color", "price": "70-150+", "note": "Hourly", "group": "Specialty Color" },
+        { "name": "Partial Balayage", "price": "140-220+", "group": "Specialty Color" },
+        { "name": "Full Balayage", "price": "180-260+", "group": "Specialty Color" },
+        { "name": "Partial Ombre", "price": "240-320+", "group": "Specialty Color" },
+        { "name": "Full Ombre", "price": "280-360+", "group": "Specialty Color" },
+        { "name": "Vibrants Refresh — Short", "price": "80-110+", "group": "Specialty Color" },
+        { "name": "Vibrants Refresh — Medium", "price": "90-120+", "group": "Specialty Color" },
+        { "name": "Vibrants Refresh — Long", "price": "100-130+", "group": "Specialty Color" },
+        { "name": "Vibrants Refresh — Extra Long", "price": "120-200+", "group": "Specialty Color" }
+      ]
+    },
+    "hairCondition": {
+      "source": "hairCondition",
+      "$note": "Add-on treatments, no blow-dry included",
+      "items": [
+        { "name": "Nutriplenish Treatment Masque", "price": "25+", "note": "Deep conditioning, hydrated shine without residue" },
+        { "name": "Botanical Repair Treatment", "price": "40+", "note": "Bond-building — hair 5X stronger after 1 service" },
+        { "name": "Scalp Solutions Treatment", "price": "35+", "note": "Exfoliate, moisturize, revitalize the scalp" }
+      ]
+    },
+    "mintMen": {
+      "source": "mintMen",
+      "items": [
+        { "name": "Cut — Short to Clipper Length", "price": "30-55+", "group": "Dry Cuts" },
+        { "name": "Cut — Medium", "price": "35-60+", "group": "Dry Cuts" },
+        { "name": "Cut — Long", "price": "40-65+", "group": "Dry Cuts" },
+        { "name": "Cut — Extra Long", "price": "45-70+", "group": "Dry Cuts" },
+        { "name": "Cut — Short to Clipper Length", "price": "40-105+", "group": "Haircut and Blow Dry" },
+        { "name": "Cut — Medium", "price": "35-105+", "group": "Haircut and Blow Dry", "note": "As printed on site — medium floor lower than short; likely site typo" },
+        { "name": "Cut — Long", "price": "50-110+", "group": "Haircut and Blow Dry" },
+        { "name": "Cut — Extra Long", "price": "55-115+", "group": "Haircut and Blow Dry" },
+        { "name": "Beard & Neck Trim", "price": "25-50+", "note": "Includes hot towel" },
+        { "name": "Children (Under 10) — Cut", "price": "30-50+", "group": "Children" },
+        { "name": "Children (Under 10) — Cut with Shampoo", "price": "40-70+", "group": "Children" },
+        { "name": "Grey Blending", "price": "40-65+", "group": "Color" }
+      ]
+    },
+    "texture": {
+      "source": "texture",
+      "items": [
+        { "name": "Perm — Short to Medium", "price": "150+" },
+        { "name": "Perm — Long", "price": "250+" },
+        { "name": "Perm — Extra Long", "price": "300+" },
+        { "name": "Brazilian Blowout", "price": "300-450+" },
+        { "name": "Yuko Japanese Straightening", "price": "500-800+" }
+      ]
+    },
+    "specialty": {
+      "source": "specialty",
+      "items": [
+        { "name": "Brow Wax", "price": "22+" },
+        { "name": "Lip Wax", "price": "15+" },
+        { "name": "Chin Wax", "price": "20+" },
+        { "name": "Brow Tinting", "price": "20+" }
+      ]
+    },
+    "extensions": {
+      "source": "homepage",
+      "items": [
+        { "name": "VoMor Extensions (tape-in / hand-tied)", "price": "Begins with a $49 consultation", "note": "Color-matched, aligned cuticle hair" }
+      ]
+    },
+    "consultation": {
+      "source": "homepage",
+      "items": [
+        { "name": "Consultation", "price": "Complimentary", "note": "Color planning, bridal, special occasion, or finding the right artist. New Guest Complimentary Consultation also listed on request-appointment page." }
+      ]
+    }
+  },
+
+  "promotions": [
+    {
+      "name": "New Guest Special — 20% off first visit",
+      "source": "newGuestSpecial",
+      "detail": "Color, cut, or care. Valid only with select artists: Marisa, Sonia, Marabel (sic), and Ashley. Downloadable gift + book via Phorest.",
+      "status": "live on site 2026-07-07"
+    },
+    {
+      "name": "Referral — $50 off",
+      "source": "referrals",
+      "detail": "Valid only with select artists: Marisa, Erin, Alexus, and Caleb. Downloadable.",
+      "status": "live on site 2026-07-07"
+    }
+  ],
+
+  "discrepanciesFoundOnLiveSources": [
+    { "field": "text number", "a": "833-390-0226 (homepage, blog post)", "b": "830-390-0226 (contact page)", "call": "833 matches Portal README founding example; contact page likely typo — CONFIRM & fix live site" },
+    { "field": "Sunday/Monday", "a": "'By appt. only' (contact page hours table)", "b": "'Closed Sunday and Monday' (request-appointment page)", "call": "Confirm which is policy" },
+    { "field": "stylist spelling", "a": "Maribel (homepage)", "b": "Marabel (new-guest-special page)", "call": "RESOLVED by Mark 2026-07-07: 'Maribel' is canonical — new-guest-special page carries the typo; fix on live site" },
+    { "field": "price widget vs service pages", "a": "Homepage widget: Single Process from $60, Partial Ombre from $220, Color Correction from $150, plus Foilyage/Color Melting/Enlighten & Tone entries", "b": "Color page: Single Process 65-90+, Partial Ombre 240-320+, Creative/Corrective 70-150+ hourly; no Foilyage/Color Melting/Enlighten & Tone rows", "call": "Two price sources on the live site disagree — pick canonical (service pages recommended) and reconcile the widget" },
+    { "field": "team page SEO", "a": "meet-the-team renders 'Sorry, none of our team members meet your selected criteria' to crawlers (JS-rendered grid, empty state in static HTML)", "b": null, "call": "Crawlers index an empty team page — worth a fix on the live site independent of this project" },
+    { "field": "referral page artists", "a": "Referral page ($50 off) lists artists: Marisa, Erin, Alexus, Caleb", "b": "Canonical roster (Mark, 2026-07-07): Mark, Marisa, Sonia Taylor, Maribel, Ashley — Erin/Alexus/Caleb not on it", "call": "Referral page appears to name artists no longer on the roster — update live page" }
+  ],
+
+  "toConfirmWithMark": [
+    "Exact Phorest booking URL (Book Now target)",
+    "Social links (Instagram/Facebook) — not present in crawled static HTML",
+    "Canonical text number (833 vs 830 — 833 presumed, matches homepage + blog)",
+    "Canonical price source (service pages vs homepage widget)",
+    "Photo/gallery assets for profiles (GBP photo available via Places API)",
+    "Optional: level (1-8) assignment per team member for price-tier display"
+  ]
+}
