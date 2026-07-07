@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en" data-campaign="base">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Salon Platform</title>
+    <meta
+      name="description"
+      content="One Portal application, many salon storefronts — powered by the NEDB engine."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Inter+Tight:wght@500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <!-- Runtime campaign identity, before first paint. The server injects
+         window.__SALON_CONFIG__ when serving the built shell, so ONE build
+         boots as whichever storefront this process is. -->
+    <script>
+      (function () {
+        try {
+          var cfg = window.__SALON_CONFIG__ || {};
+          if (cfg.campaignId) {
+            document.documentElement.setAttribute("data-campaign", cfg.campaignId);
+          }
+          if (cfg.brandName) {
+            document.title = cfg.brandName;
+          }
+        } catch (e) {}
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

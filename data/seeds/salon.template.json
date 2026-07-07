@@ -1,0 +1,116 @@
+{
+  "$comment": "GENERIC SALON SEED — the reusable shape for ANY salon on the Portal Salon Platform. Copy to data/seeds/<your-salon>.json, fill with REAL data (cite your sources in 'sources'), and point your deployment at it. The deploy seeder loads every *.json in SEED_DIR (default ./data/seeds), validates against the identity-type schemas (spec §6), and writes each salon + team + services into NEDB with provenance (caused_by → this file's hash). Campaign configs reference salons by handle (e.g. orlando's anchorSalonHandle: 'mint-on-the-avenue'). Everything here is DATA, not code: titles, categories, price formats, and promos are free-form — your salon's own taxonomy fits without touching the platform.",
+  "$version": 1,
+
+  "retrievedAt": "YYYY-MM-DD",
+  "sources": {
+    "$comment": "Where each section's facts came from — live site URLs, GBP, or 'owner-provided'. Real data only; never invented.",
+    "homepage": "https://example-salon.com/",
+    "googlePlaces": "place_id or 'owner-provided'"
+  },
+
+  "salon": {
+    "identityType": "salon",
+    "handle": "example-salon",
+    "displayName": "Example Salon",
+    "status": "draft",
+    "entity": {
+      "nap": {
+        "name": "Example Salon",
+        "street": "123 Main St",
+        "city": "Anytown",
+        "region": "ST",
+        "postal": "00000",
+        "country": "US",
+        "phone": "+1-000-000-0000"
+      },
+      "textLine": "optional SMS line",
+      "email": "hello@example-salon.com",
+      "geo": { "lat": 0.0, "lng": 0.0 },
+      "hours": [
+        { "day": "Sunday", "note": "Closed | By appointment only" },
+        { "day": "Monday", "open": "09:00", "close": "17:00" }
+      ],
+      "priceRange": "$-$$$$",
+      "bookingPlatform": "Phorest | Square | Vagaro | GlossGenius | phone | ...",
+      "bookingUrl": "https://...",
+      "gbp": {
+        "listedName": "Exact Google Business Profile name",
+        "placeId": "ChIJ...",
+        "mapsUrl": "https://maps.google.com/?cid=...",
+        "rating": null,
+        "reviewCount": null,
+        "categories": ["hair_salon"]
+      },
+      "brands": ["product lines carried — e.g. Aveda, Redken, Oribe"],
+      "designations": ["e.g. Aveda Concept Salon, family-owned"],
+      "locationNotes": "landmarks / parking / how to find the door",
+      "cityId": "slug into the cities collection",
+      "positioning": {
+        "tagline": "one line that IS the brand",
+        "heroLine": "the sentence under the name",
+        "philosophy": "the paragraph that explains why this salon exists",
+        "retail": "what guests can take home"
+      },
+      "serviceInclusions": "what EVERY service includes (consultation, rituals, massage...)",
+      "stylistLevels": "optional: describe your pricing-tier system (e.g. 'Level 1-8 artists — prices are starting rates')",
+      "social": {
+        "instagram": "https://instagram.com/...",
+        "facebook": "https://facebook.com/...",
+        "tiktok": "optional"
+      }
+    }
+  },
+
+  "team": [
+    {
+      "$comment": "Titles are free-form DATA — your taxonomy, not our enum. 'roles' are slugs for filtering/rendering; 'level' optionally maps a member onto YOUR pricing tiers; 'isProvider' controls team-grid + bookable rendering — anyone who takes clients (stylists, colorists, nail technicians, estheticians) is true; owners/managers/assistants who don't take their own clients set false.",
+      "name": "Full Name",
+      "title": "Master Stylist / Color Director / Junior Stylist / General Manager — whatever is true",
+      "roles": ["master-stylist"],
+      "level": null,
+      "owner": false,
+      "isProvider": true,
+      "bio": "optional — in the salon's voice",
+      "instagram": "optional",
+      "bookable": true
+    }
+  ],
+
+  "services": {
+    "$comment": "Categories are free-form keys — mirror how YOUR menu is organized. Prices are strings to preserve honest formats: '65-90+', 'from $180', 'hourly', 'complimentary'. 'group' optionally sub-organizes within a category.",
+    "your-category-slug": {
+      "source": "which source URL this table came from",
+      "items": [
+        { "name": "Service Name", "price": "0-0+", "group": "optional subgroup", "note": "optional" }
+      ]
+    }
+  },
+
+  "promotions": [
+    {
+      "name": "e.g. New Guest 20% off",
+      "detail": "conditions, artists, how to claim",
+      "source": "URL or owner-provided",
+      "status": "live | scheduled | expired",
+      "valid_from": "optional ISO date — engine schedules go-live",
+      "valid_to": "optional ISO date — engine auto-expires"
+    }
+  ],
+
+  "media": [
+    { "kind": "photo", "url": "https://...", "alt": "required — describe it", "credit": "optional" }
+  ],
+
+  "faqs": [
+    { "q": "question guests actually ask", "a": "the answer in the salon's voice", "scope": "salon" }
+  ],
+
+  "discrepanciesFoundOnLiveSources": [
+    { "$comment": "When your own sources disagree (site vs GBP vs print), record it here instead of silently picking — the platform renders canonical data, and this list is your fix-it queue." }
+  ],
+
+  "toConfirmWithOwner": [
+    "anything the crawl couldn't verify — booking URL, socials, roster, canonical prices"
+  ]
+}
