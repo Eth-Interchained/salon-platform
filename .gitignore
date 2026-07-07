@@ -1,0 +1,20 @@
+# dependencies
+node_modules/
+pnpm-lock.yaml
+
+# build output
+dist/
+*.tsbuildinfo
+
+# env / secrets — never commit the real values
+.env
+.env.local
+.env.*.local
+
+# local engine data
+nedb-data/
+
+# logs / os
+npm-debug.log*
+yarn-error.log*
+.DS_Store
