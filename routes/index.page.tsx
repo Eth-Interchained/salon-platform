@@ -1,4 +1,5 @@
 import React from "react";
+import { Head } from "@interchained/portal-react";
 
 import { useAppConfig } from "../src/lib/useAppConfig";
 
@@ -6,7 +7,7 @@ export const intent = {
   purpose:
     "Prove one build serves many storefronts — the SAME DOM renders three distinct products via campaign theme tokens",
   primaryAction: "Verify the storefront feels like its campaign",
-  seoKeyword: "salon",
+  seoKeyword: "aveda salon",
 };
 
 /**
@@ -31,6 +32,10 @@ export default function HomePage(): React.ReactElement {
 
   return (
     <main className="min-h-screen max-w-3xl mx-auto px-6 py-14 flex flex-col gap-10">
+      <Head
+        title={cfg.brandName}
+        description="One platform, many storefronts — Aveda salon campaigns and the independent-salon directory, rendered by Portal and powered by the NEDB engine."
+      />
       <header className="flex items-center justify-between gap-4">
         <p className="font-display text-2xl font-bold tracking-tight">{cfg.brandName}</p>
         <span className="chip">{cfg.campaignId}</span>
@@ -65,8 +70,8 @@ export default function HomePage(): React.ReactElement {
       </nav>
 
       <footer className="mt-auto pt-8 kicker">
-        Portal Salon Platform · NEDB stores knowledge, Portal renders experiences, Links
-        publishes identity
+        The platform behind Aveda salon storefronts and the independent-salon directory ·
+        NEDB stores knowledge, Portal renders experiences, Links publishes identity
       </footer>
     </main>
   );

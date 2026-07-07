@@ -61,6 +61,11 @@ function track(db: NedbClient, event: Record<string, unknown>): void {
   });
 }
 
+/** Warn ONCE per process when the anchor salon has no bookable URL —
+ *  conversion-critical absence must be loud in the logs, never silent.
+ *  (Lesson from the live booking-button incident, 2026-07-07.) */
+let warnedNoBookingUrl = false;
+
 /** Tracked CTA row — every conversion path goes through /go. The booking
  *  URL is DATA (entity.bookingUrl from the seed) — a salon without one
  *  simply doesn't get the button; call/text remain. */
@@ -69,6 +74,14 @@ function ctaRow(salon: SalonDoc, origin: string): string {
   const tel = telHref(e.nap?.phone);
   const sms = smsHref(e.textLine);
   const book = typeof e.bookingUrl === "string" && /^https:\/\//.test(e.bookingUrl) ? e.bookingUrl : null;
+  if (!book && !warnedNoBookingUrl) {
+    warnedNoBookingUrl = true;
+    console.warn(
+      `\x1b[33m[salon] ⚠ anchor salon "${salon.handle ?? "?"}" has no valid https bookingUrl — ` +
+        `the booking button is HIDDEN on every page. If this is production, re-seed with a ` +
+        `confirmed bookingUrl (entity.bookingUrl) immediately.\x1b[0m`,
+    );
+  }
   const go = (kind: string, to: string) => `/go/${kind}?to=${encodeURIComponent(to)}`;
   const parts: string[] = [];
   if (book) parts.push(`<a class="btn solid" href="${esc(go("booking_click", book))}">Book an appointment</a>`);
