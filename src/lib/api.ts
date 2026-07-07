@@ -15,6 +15,7 @@ export interface AppConfig {
   theme: string;
   surfaces: string[];
   nav: { label: string; href: string }[];
+  primaryGoal: string;
 }
 
 declare global {

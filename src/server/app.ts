@@ -21,6 +21,7 @@ import type { NedbClient } from "nedb-engine-client";
 
 import type { SalonConfig } from "./config";
 import { createDb } from "./db";
+import { createRenderRouter } from "./render";
 
 export interface AppHandle {
   app: Express;
@@ -84,6 +85,11 @@ export function createApp(cfg: SalonConfig): AppHandle {
     res.json(publicConfig(cfg));
   });
 
+  // ── Public render router — server-rendered surfaces (spec §7) ────────────
+  // Mounted BEFORE static so config-driven robots/sitemap can never be
+  // shadowed by a stray file in dist.
+  app.use(createRenderRouter(cfg));
+
   // ── SPA shell (production build) ──────────────────────────────────────────
   // Runtime campaign injection: ONE build serves every storefront, so the
   // shell learns its identity when served, not when built. The injected
@@ -104,8 +110,6 @@ export function createApp(cfg: SalonConfig): AppHandle {
     app.get(["/", "/index.html"], (_req, res) => sendShell(res));
     app.use(express.static(dist, { index: false }));
   }
-
-  // ── Public render router mounts here in PR-2 (spec §7) ────────────────────
 
   // ── SPA fallback ──────────────────────────────────────────────────────────
   app.get("*", (req: Request, res: Response) => {
@@ -139,5 +143,6 @@ export function publicConfig(cfg: SalonConfig): Record<string, unknown> {
     theme: c.theme.id,
     surfaces: c.surfaces,
     nav: c.nav,
+    primaryGoal: c.conversion.primaryGoal,
   };
 }

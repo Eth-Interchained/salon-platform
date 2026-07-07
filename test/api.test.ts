@@ -84,11 +84,32 @@ test("the same build boots as all three storefronts", async () => {
       brandName: string;
       domain: string;
       nav: unknown[];
+      primaryGoal: string;
     };
     assert.equal(c.campaignId, id);
     assert.equal(c.brandName, CAMPAIGNS[id].brandName, `${id}: brand follows campaign`);
     assert.equal(c.domain, CAMPAIGNS[id].domain);
     assert.ok(Array.isArray(c.nav) && c.nav.length > 0, `${id}: nav present`);
+    assert.equal(c.primaryGoal, CAMPAIGNS[id].conversion.primaryGoal, `${id}: primaryGoal`);
+
+    // server-rendered public surfaces (PR-2 render skeleton)
+    const robots = await fetch(`${base}/robots.txt`);
+    assert.equal(robots.status, 200, `${id}: robots status`);
+    assert.match(robots.headers.get("content-type") ?? "", /text\/plain/, id);
+    const robotsBody = await robots.text();
+    assert.ok(
+      robotsBody.includes(`Sitemap: https://${CAMPAIGNS[id].domain}/sitemap.xml`),
+      `${id}: robots sitemap line on the campaign's own origin`,
+    );
+
+    const sitemap = await fetch(`${base}/sitemap.xml`);
+    assert.equal(sitemap.status, 200, `${id}: sitemap status`);
+    assert.match(sitemap.headers.get("content-type") ?? "", /application\/xml/, id);
+    const sitemapBody = await sitemap.text();
+    assert.ok(
+      sitemapBody.includes(`<loc>https://${CAMPAIGNS[id].domain}/</loc>`),
+      `${id}: sitemap homepage on the campaign's own origin`,
+    );
   }
 });
 
