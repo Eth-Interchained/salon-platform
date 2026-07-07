@@ -164,3 +164,66 @@ test("seed loader: real file → real engine, provenance-chained, idempotent", a
   const v = await db.verify();
   assert.equal(v.ok, true, "verify green after seeding");
 });
+
+test("orlando surfaces: server-rendered pages from real engine data", async () => {
+  // depends on the seed test above having populated TEST_DB
+  const base = await bootCampaign("orlando");
+
+  // home — real NAP, JSON-LD, meta description, tracked CTAs
+  const home = await fetch(`${base}/`);
+  assert.equal(home.status, 200);
+  assert.match(home.headers.get("content-type") ?? "", /text\/html/);
+  const homeHtml = await home.text();
+  assert.ok(homeHtml.includes("228 N Park Ave"), "real street address renders");
+  assert.ok(homeHtml.includes("407-645-2264"), "real phone renders");
+  assert.ok(homeHtml.includes(`"@type":"HairSalon"`), "HairSalon JSON-LD present");
+  assert.ok(!homeHtml.includes("aggregateRating"), "no self-marked-up Google rating");
+  assert.ok(homeHtml.includes(`<meta name="description"`), "meta description present");
+  assert.ok(homeHtml.includes("/go/booking_click?to="), "booking CTA is click-tracked");
+  assert.ok(homeHtml.includes("Sonia Taylor"), "canonical roster renders");
+
+  // service category page — real price table
+  const color = await fetch(`${base}/services/hair-color`);
+  assert.equal(color.status, 200);
+  const colorHtml = await color.text();
+  assert.ok(colorHtml.includes("Full Balayage"), "real menu item");
+  assert.ok(colorHtml.includes("180-260+"), "real price range");
+  assert.ok(colorHtml.includes(`"@type":"BreadcrumbList"`), "breadcrumbs JSON-LD");
+
+  // city gating: the anchor's own city renders; others are HELD (404 → shell 503 in test env)
+  const wp = await fetch(`${base}/winter-park`);
+  assert.equal(wp.status, 200, "winter-park (anchor city) renders");
+  const wpHtml = await wp.text();
+  assert.ok(wpHtml.includes("Aveda salon in Winter Park"), "city H1");
+  const held = await fetch(`${base}/orlando`);
+  assert.equal(held.status, 404, "known-but-held cities return a REAL 404");
+  const heldHtml = await held.text();
+  assert.ok(heldHtml.includes("noindex"), "held page carries noindex");
+  assert.ok(heldHtml.includes("still at the shampoo bowl"), "branded held page, not the shell");
+
+  // /go event tracking: records then redirects
+  const before = await fetch(`${base}/api/health`).then(() => 0); // warm
+  void before;
+  const go = await fetch(`${base}/go/call_click?to=tel:%2B14076452264&src=test`, { redirect: "manual" });
+  assert.equal(go.status, 302);
+  assert.equal(go.headers.get("location"), "tel:+14076452264");
+  const bad = await fetch(`${base}/go/call_click?to=javascript:alert(1)`, { redirect: "manual" });
+  assert.equal(bad.status, 400, "unsafe destinations rejected");
+  // event landed in the engine (fire-and-forget — poll briefly)
+  const { createDb } = await import("../src/server/db");
+  const db = createDb({ nedbUrl: NEDB_TEST_URL, nedbDb: TEST_DB, nedbToken: undefined });
+  let events: Record<string, unknown>[] = [];
+  for (let i = 0; i < 10; i++) {
+    events = await db.query(`FROM events WHERE kind = "call_click"`);
+    if (events.length > 0) break;
+    await new Promise((r) => setTimeout(r, 100));
+  }
+  assert.ok(events.length >= 1, "call_click event recorded in the engine");
+  assert.equal(events[0].source, "test", "source attribution preserved");
+
+  // sitemap now advertises exactly the live surfaces
+  const sm = await fetch(`${base}/sitemap.xml`).then((r) => r.text());
+  assert.ok(sm.includes("/services/hair-color"), "sitemap grew from engine data");
+  assert.ok(sm.includes("/winter-park"), "anchor city in sitemap");
+  assert.ok(!sm.includes("/orlando<"), "held cities NOT advertised");
+});
