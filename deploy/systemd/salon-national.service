@@ -1,0 +1,21 @@
+# Portal Salon Platform — national storefront
+# Install: cp deploy/systemd/salon-national.service /etc/systemd/system/
+#          systemctl daemon-reload && systemctl enable --now salon-national
+
+[Unit]
+Description=Portal Salon Platform — national (aveda-salon.com :3202)
+After=network.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/root/salon-platform
+EnvironmentFile=/root/salon-platform/deploy/national.env
+ExecStart=/usr/bin/env npm run start
+Restart=on-failure
+RestartSec=3
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

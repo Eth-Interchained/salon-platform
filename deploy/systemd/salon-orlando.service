@@ -1,0 +1,24 @@
+# Portal Salon Platform — orlando storefront
+# Install: cp deploy/systemd/salon-orlando.service /etc/systemd/system/
+#          systemctl daemon-reload && systemctl enable --now salon-orlando
+# NOTE: adjust WorkingDirectory + EnvironmentFile to the checkout path, and
+# ExecStart to the box's node install if npm isn't on the system PATH.
+
+[Unit]
+Description=Portal Salon Platform — orlando (aveda-salon-orlando.com :3201)
+After=network.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/root/salon-platform
+EnvironmentFile=/root/salon-platform/deploy/orlando.env
+ExecStart=/usr/bin/env npm run start
+Restart=on-failure
+RestartSec=3
+# stdout carries the color-coded request log; journalctl -u salon-orlando -f
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
