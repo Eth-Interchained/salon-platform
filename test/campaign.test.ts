@@ -29,9 +29,12 @@ test("locked decision: domains match the spec", () => {
 test("orlando targets exactly the 13 locked cities", () => {
   const cities = CAMPAIGNS.orlando.geography?.cities ?? [];
   assert.equal(cities.length, 13);
+  const slugs = cities.map((c) => c.slug);
   for (const expected of ["orlando", "winter-park", "maitland", "dr-phillips", "windermere"]) {
-    assert.ok(cities.includes(expected), `missing city: ${expected}`);
+    assert.ok(slugs.includes(expected), `missing city: ${expected}`);
   }
+  // display names are curated, never slug-derived
+  assert.equal(cities.find((c) => c.slug === "dr-phillips")?.name, "Dr. Phillips");
 });
 
 test("orlando anchors on Mint on the Avenue", () => {
