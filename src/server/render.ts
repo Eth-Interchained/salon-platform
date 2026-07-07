@@ -13,9 +13,12 @@
  */
 
 import { Router } from "express";
+import type { NedbClient } from "nedb-engine-client";
 
 import type { CampaignDefinition } from "../lib/campaign";
 import type { SalonConfig } from "./config";
+import { getIdentityByHandle, listServiceMenus } from "./entities";
+import { createPagesRouter } from "./pages";
 
 /** The absolute origin every public URL is built from. */
 export function campaignOrigin(cfg: Pick<SalonConfig, "publicOrigin">, campaign: CampaignDefinition): string {
@@ -48,14 +51,10 @@ function xmlEscape(s: string): string {
     .replace(/"/g, "&quot;");
 }
 
-/**
- * sitemap.xml — PR-2 skeleton emits the homepage only. Honest by design:
- * no invented URLs, no faked lastmod. Phase 1 grows this into per-section
- * NQL queries over published documents (campaign.seo.sitemapSections),
- * with lastmod from engine version timestamps.
- */
-export function buildSitemap(_campaign: CampaignDefinition, origin: string): string {
-  const urls = [`${origin}/`];
+/** Render a urlset from absolute URLs. Honest by design: no invented
+ *  URLs, no faked lastmod (engine-timestamp lastmod arrives when pages
+ *  are engine documents with versions worth citing). */
+export function buildSitemap(urls: string[]): string {
   const body = urls
     .map((u) => `  <url>\n    <loc>${xmlEscape(u)}</loc>\n  </url>`)
     .join("\n");
@@ -67,7 +66,30 @@ export function buildSitemap(_campaign: CampaignDefinition, origin: string): str
   );
 }
 
-export function createRenderRouter(cfg: SalonConfig): Router {
+/** The campaign's live public URLs — queried from the ENGINE at request
+ *  time, so the sitemap can never advertise a page that wouldn't render.
+ *  Mirrors the pages router's own gating exactly (anchor salon present,
+ *  city held to the salon's own city). */
+export async function sitemapUrls(
+  campaign: CampaignDefinition,
+  origin: string,
+  db: NedbClient,
+): Promise<string[]> {
+  const urls = [`${origin}/`];
+  const anchor = campaign.anchorSalonHandle;
+  if (!anchor) return urls;
+  const salon = (await getIdentityByHandle(db, anchor)) as { cityId?: string | null } | null;
+  if (!salon) return urls; // unseeded engine → homepage only
+  urls.push(`${origin}/services`);
+  const menus = await listServiceMenus(db, anchor);
+  for (const m of menus) {
+    urls.push(`${origin}/services/${String(m.category)}`);
+  }
+  if (salon.cityId) urls.push(`${origin}/${salon.cityId}`);
+  return urls;
+}
+
+export function createRenderRouter(cfg: SalonConfig, db: NedbClient): Router {
   const campaign = cfg.campaign;
   if (!campaign) {
     throw new Error("createRenderRouter: cfg.campaign is null");
@@ -80,10 +102,16 @@ export function createRenderRouter(cfg: SalonConfig): Router {
     res.send(buildRobots(campaign, origin));
   });
 
-  router.get("/sitemap.xml", (_req, res) => {
-    res.setHeader("content-type", "application/xml; charset=utf-8");
-    res.send(buildSitemap(campaign, origin));
+  router.get("/sitemap.xml", (_req, res, next) => {
+    void (async () => {
+      const urls = await sitemapUrls(campaign, origin, db);
+      res.setHeader("content-type", "application/xml; charset=utf-8");
+      res.send(buildSitemap(urls));
+    })().catch(next);
   });
+
+  // Salon surfaces — mounted only when the campaign anchors on a salon.
+  router.use(createPagesRouter(cfg, campaign, db, origin));
 
   return router;
 }

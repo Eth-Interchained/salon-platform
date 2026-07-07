@@ -66,7 +66,7 @@ export const orlando = defineCampaign({
   },
   conversion: {
     primaryGoal: "Book an appointment",
-    successEvents: ["booking_click", "call_click", "direction_click"],
+    successEvents: ["booking_click", "call_click", "text_click", "direction_click"],
   },
   contentPlan: {
     collections: ["landing_pages", "articles", "faqs", "promotions"],

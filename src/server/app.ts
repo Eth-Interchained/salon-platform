@@ -87,8 +87,9 @@ export function createApp(cfg: SalonConfig): AppHandle {
 
   // ── Public render router — server-rendered surfaces (spec §7) ────────────
   // Mounted BEFORE static so config-driven robots/sitemap can never be
-  // shadowed by a stray file in dist.
-  app.use(createRenderRouter(cfg));
+  // shadowed by a stray file in dist. NOTE: for anchor-salon campaigns the
+  // router owns "/" — the SPA shell serves interactive surfaces only.
+  app.use(createRenderRouter(cfg, db));
 
   // ── SPA shell (production build) ──────────────────────────────────────────
   // Runtime campaign injection: ONE build serves every storefront, so the

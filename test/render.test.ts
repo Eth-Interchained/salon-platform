@@ -45,20 +45,15 @@ test("robots.txt: holdback posture blocks everything", () => {
   assert.ok(/^Disallow: \/$/m.test(robots));
 });
 
-test("sitemap.xml: valid urlset with the homepage on the campaign origin", () => {
-  for (const id of CAMPAIGN_IDS) {
-    const c = CAMPAIGNS[id];
-    const origin = `https://${c.domain}`;
-    const xml = buildSitemap(c, origin);
-    assert.ok(xml.startsWith(`<?xml version="1.0" encoding="UTF-8"?>`), id);
-    assert.ok(xml.includes(`<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">`), id);
-    assert.ok(xml.includes(`<loc>${origin}/</loc>`), `${id}: homepage loc`);
-    // honest by design: the skeleton never fakes lastmod
-    assert.ok(!xml.includes("<lastmod>"), `${id}: no invented lastmod`);
-    // canonical discipline: every loc lives on this campaign's origin
-    const locs = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]);
-    for (const loc of locs) {
-      assert.ok(loc.startsWith(origin), `${id}: cross-origin loc ${loc}`);
-    }
-  }
+test("sitemap.xml: valid urlset, xml-escaped, no invented lastmod", () => {
+  const xml = buildSitemap([
+    "https://aveda-salon-orlando.com/",
+    "https://aveda-salon-orlando.com/services/hair-color",
+    "https://aveda-salon-orlando.com/a&b",
+  ]);
+  assert.ok(xml.startsWith(`<?xml version="1.0" encoding="UTF-8"?>`));
+  assert.ok(xml.includes(`<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">`));
+  assert.ok(xml.includes(`<loc>https://aveda-salon-orlando.com/services/hair-color</loc>`));
+  assert.ok(xml.includes(`<loc>https://aveda-salon-orlando.com/a&amp;b</loc>`), "xml escaping");
+  assert.ok(!xml.includes("<lastmod>"), "no invented lastmod");
 });

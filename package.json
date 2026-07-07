@@ -16,7 +16,7 @@
     "guard": "portal guard",
     "seed": "tsx scripts/seed.ts",
     "typecheck": "tsc --noEmit",
-    "test": "tsx --test test/campaign.test.ts test/config.test.ts test/render.test.ts test/seed.test.ts",
+    "test": "tsx --test test/campaign.test.ts test/config.test.ts test/render.test.ts test/seed.test.ts test/seo.test.ts",
     "test:api": "tsx --test test/api.test.ts"
   },
   "dependencies": {
