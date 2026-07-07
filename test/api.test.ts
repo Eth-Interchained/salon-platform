@@ -120,3 +120,47 @@ test("unknown /api/* routes 404 as JSON, not the SPA shell", async () => {
   const j = (await r.json()) as { error: string };
   assert.equal(j.error, "not found");
 });
+
+test("seed loader: real file → real engine, provenance-chained, idempotent", async () => {
+  const { createDb } = await import("../src/server/db");
+  const { seedAll } = await import("../src/server/seed");
+  const { getIdentityByHandle, listTeam, listServiceMenus, getCity } = await import(
+    "../src/server/entities"
+  );
+
+  const db = createDb({ nedbUrl: NEDB_TEST_URL, nedbDb: TEST_DB, nedbToken: undefined });
+
+  // first run — Mint's real data lands
+  const result = await seedAll(db, Object.values(CAMPAIGNS), "data/seeds");
+  assert.equal(result.summaries.length, 1, "one real seed file");
+  assert.equal(result.summaries[0].salonHandle, "mint-on-the-avenue");
+  assert.equal(result.summaries[0].identities, 8, "1 salon + 7 team");
+  assert.ok(result.summaries[0].serviceMenus >= 6, "menu categories");
+  assert.equal(result.cities, 13, "13 unique cities across campaigns (directory ⊂ orlando)");
+
+  // reads the render plane will use
+  const salon = await getIdentityByHandle(db, "mint-on-the-avenue");
+  assert.ok(salon, "salon resolves via handle");
+  assert.equal(salon?.identityType, "salon");
+  const nap = (salon?.entity as { nap?: { phone?: string } })?.nap;
+  assert.equal(nap?.phone, "+1-407-645-2264", "real NAP data intact");
+
+  // flat-key WHERE queries — the Phase-1 relation model, proven on the engine
+  const team = await listTeam(db, "mint-on-the-avenue");
+  assert.equal(team.length, 7, "WHERE salonHandle + identityType works");
+  const menus = await listServiceMenus(db, "mint-on-the-avenue");
+  assert.ok(menus.some((m) => m.category === "hair-color"), "hair-color menu present");
+
+  const city = await getCity(db, "dr-phillips");
+  assert.equal(city?.name, "Dr. Phillips", "curated city display name");
+
+  // idempotency: re-running the unchanged seed writes NOTHING
+  const before = await db.seq();
+  await seedAll(db, Object.values(CAMPAIGNS), "data/seeds");
+  const after = await db.seq();
+  assert.equal(after, before, `re-run must be a no-op (wrote ${after - before})`);
+
+  // and the whole database still proves integrity
+  const v = await db.verify();
+  assert.equal(v.ok, true, "verify green after seeding");
+});

@@ -49,7 +49,18 @@ export const directory = defineCampaign({
   geography: {
     country: "US",
     state: "FL",
-    cities: ["orlando", "winter-park", "maitland", "altamonte-springs", "oviedo", "winter-garden", "lake-mary", "longwood", "sanford", "windermere"],
+    cities: [
+      { slug: "orlando", name: "Orlando" },
+      { slug: "winter-park", name: "Winter Park" },
+      { slug: "maitland", name: "Maitland" },
+      { slug: "altamonte-springs", name: "Altamonte Springs" },
+      { slug: "oviedo", name: "Oviedo" },
+      { slug: "winter-garden", name: "Winter Garden" },
+      { slug: "lake-mary", name: "Lake Mary" },
+      { slug: "longwood", name: "Longwood" },
+      { slug: "sanford", name: "Sanford" },
+      { slug: "windermere", name: "Windermere" },
+    ],
   },
   conversion: {
     primaryGoal: "Salon owner claims a listing",

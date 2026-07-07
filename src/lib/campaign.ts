@@ -76,11 +76,17 @@ export interface CampaignSeo {
   robots: RobotsPolicy;
 }
 
+export interface CityRef {
+  /** Slug into the cities collection (and the URL segment). */
+  slug: string;
+  /** Display name — never derived from the slug (Dr. Phillips ≠ Dr-phillips). */
+  name: string;
+}
+
 export interface CampaignGeography {
   country: string;
   state: string;
-  /** Slugs into the cities collection. */
-  cities: string[];
+  cities: CityRef[];
 }
 
 export interface CampaignConversion {
@@ -159,7 +165,14 @@ export const campaignSchema: z.ZodType<CampaignDefinition> = z.object({
     .object({
       country: z.string().length(2),
       state: z.string().min(2),
-      cities: z.array(z.string().regex(/^[a-z0-9-]+$/)).min(1),
+      cities: z
+        .array(
+          z.object({
+            slug: z.string().regex(/^[a-z0-9-]+$/),
+            name: z.string().min(1),
+          }),
+        )
+        .min(1),
     })
     .optional(),
   conversion: z.object({

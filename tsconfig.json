@@ -16,5 +16,5 @@
     "types": ["node"],
     "paths": { "@/*": ["./src/*"] }
   },
-  "include": ["src", "routes", "campaigns", "test", "app.contract.ts", "server.ts", "vite.config.ts"]
+  "include": ["src", "routes", "campaigns", "test", "scripts", "app.contract.ts", "server.ts", "vite.config.ts"]
 }
