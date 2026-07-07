@@ -50,8 +50,12 @@ export default defineConfig(({ mode }) => {
   // like production. (Lesson inherited from nedb-links: without this split,
   // server-rendered surfaces 404 into the SPA during `npm run dev`.)
   const SPA_PREFIXES = ["/admin", "/src", "/node_modules", "/assets"];
+  // Server-rendered surfaces that LOOK like files but belong to the API —
+  // the dot heuristic below must not capture them.
+  const API_FILES = new Set(["/robots.txt", "/sitemap.xml"]);
   function servedByVite(url: string): boolean {
     const path = url.split("?")[0];
+    if (API_FILES.has(path)) return false;
     if (path === "/" || path === "/index.html") return true;
     if (path.startsWith("/@")) return true; // vite client, HMR, virtual modules
     if (path.includes(".")) return true; // files with extensions (favicon, ts, css…)

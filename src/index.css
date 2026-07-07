@@ -3,39 +3,143 @@
 @tailwind utilities;
 
 /**
- * PR-1 base tokens only. Campaign theme packs (per-storefront palettes,
- * radius/shadow registers, font pairings) land in PR-2 — keyed off the
- * data-campaign attribute the pre-paint script sets on <html>.
- * Doctrine (from NEDB Links): STRUCTURE IS UNIVERSAL, SKIN IS TOKENIZED.
+ * Campaign theme token packs — the three skins from the blessed design
+ * direction (2026-07-07): Park Avenue Warm · The Reading Room · The Utility.
+ *
+ * Doctrine (inherited from NEDB Links): STRUCTURE IS UNIVERSAL, SKIN IS
+ * TOKENIZED. One DOM, one component set; the data-campaign attribute on
+ * <html> (set pre-paint from window.__SALON_CONFIG__) selects the physics.
+ * If a campaign ever needs a JSX fork to feel different, the theme system
+ * has failed and we fix the tokens — that is the PR-2 exit test.
  */
 
 :root {
+  /* base (pre-config paint, and the fallback for unknown campaigns) */
   --bg: #f8fafc;
-  --fg: #0f172a;
   --card: #ffffff;
+  --ink: #0f172a;
+  --ink-soft: rgb(15 23 42 / 0.62);
   --accent: #0f2f27;
+  --accent-contrast: #f8fafc;
+  --accent-2: #64748b;
+  --line: rgb(15 23 42 / 0.1);
   --radius-card: 1rem;
+  --radius-ctl: 999px;
+  --shadow-card: 0 1px 2px rgb(15 23 42 / 0.04), 0 8px 24px rgb(15 23 42 / 0.06);
+  --font-display: "Inter Tight", "Inter", system-ui, sans-serif;
+  --font-body: "Inter", system-ui, sans-serif;
+  --font-data: "JetBrains Mono", ui-monospace, monospace;
+}
+
+/* ── orlando · Park Avenue Warm ─────────────────────────────────────────
+   Lived-in luxury that books appointments. Fraunces carries the editorial-
+   color voice; botanical green is authority, champagne sand is warmth. */
+[data-campaign="orlando"] {
+  --bg: #f6f2ea;
+  --card: #fffdf8;
+  --ink: #1c2420;
+  --ink-soft: rgb(28 36 32 / 0.66);
+  --accent: #0f2f27;
+  --accent-contrast: #e9dfc8;
+  --accent-2: #b49a63;
+  --line: rgb(15 47 39 / 0.13);
+  --radius-card: 18px;
+  --radius-ctl: 999px;
+  --shadow-card: 0 1px 2px rgb(15 47 39 / 0.05), 0 14px 34px rgb(15 47 39 / 0.08);
+  --font-display: "Fraunces", Georgia, serif;
+  --font-body: "Inter", system-ui, sans-serif;
+}
+
+/* ── national · The Reading Room ────────────────────────────────────────
+   Paper-of-record register: ink rules instead of shadows, Newsreader for
+   long reading, one deep-green accent — family resemblance, not a match. */
+[data-campaign="national"] {
+  --bg: #fcfcfa;
+  --card: #ffffff;
+  --ink: #16181d;
+  --ink-soft: rgb(22 24 29 / 0.64);
+  --accent: #1d4d3f;
+  --accent-contrast: #fcfcfa;
+  --accent-2: #16181d;
+  --line: rgb(22 24 29 / 0.16);
+  --radius-card: 4px;
+  --radius-ctl: 3px;
+  --shadow-card: none;
+  --font-display: "Newsreader", Georgia, serif;
+  --font-body: "Newsreader", Georgia, serif;
+}
+
+/* ── directory · The Utility ────────────────────────────────────────────
+   A tool professionals reach for: cool slate, functional blue, verified
+   green, dense Inter Tight. Trust signals over decoration, speed over both. */
+[data-campaign="directory"] {
+  --bg: #f4f6f9;
+  --card: #ffffff;
+  --ink: #0f172a;
+  --ink-soft: rgb(15 23 42 / 0.6);
+  --accent: #2563eb;
+  --accent-contrast: #ffffff;
+  --accent-2: #059669;
+  --line: #e2e8f0;
+  --radius-card: 16px;
+  --radius-ctl: 10px;
+  --shadow-card: 0 1px 3px rgb(15 23 42 / 0.06);
+  --font-display: "Inter Tight", "Inter", system-ui, sans-serif;
+  --font-body: "Inter", system-ui, sans-serif;
 }
 
 @layer base {
   body {
     @apply antialiased;
     background: var(--bg);
-    color: var(--fg);
-    font-family: "Inter", system-ui, sans-serif;
+    color: var(--ink);
+    font-family: var(--font-body);
+    transition: background 0.2s ease;
   }
 }
 
 @layer components {
+  .font-display {
+    font-family: var(--font-display);
+  }
   .panel {
     background: var(--card);
     border-radius: var(--radius-card);
-    border: 1px solid rgb(15 23 42 / 0.08);
-    box-shadow: 0 1px 2px rgb(15 23 42 / 0.04), 0 8px 24px rgb(15 23 42 / 0.06);
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow-card);
+  }
+  /* The Reading Room draws authority from rules, not shadows. */
+  [data-campaign="national"] .panel {
+    border-top: 3px solid var(--accent-2);
   }
   .chip {
-    @apply inline-flex items-center px-3 py-1 text-xs font-mono rounded-full;
+    @apply inline-flex items-center px-3 py-1 text-xs;
+    font-family: var(--font-data);
+    border-radius: var(--radius-ctl);
     background: var(--accent);
-    color: var(--bg);
+    color: var(--accent-contrast);
+  }
+  .chip-ghost {
+    @apply inline-flex items-center px-3 py-1 text-xs font-semibold;
+    border-radius: var(--radius-ctl);
+    border: 1px solid var(--line);
+    color: var(--ink);
+    background: var(--card);
+  }
+  .btn-primary {
+    @apply inline-flex items-center justify-center px-6 py-3 text-sm font-bold no-underline;
+    font-family: var(--font-display);
+    border-radius: var(--radius-ctl);
+    background: var(--accent);
+    color: var(--accent-contrast);
+  }
+  .kicker {
+    font-family: var(--font-data);
+    @apply text-[11px] uppercase;
+    letter-spacing: 0.14em;
+    color: var(--ink-soft);
+  }
+  .muted {
+    color: var(--ink-soft);
   }
 }
