@@ -284,6 +284,158 @@ ${ctaRow(salon, origin)}`;
     })().catch(next);
   });
 
+  // ── GET /stylists — the roster (registered BEFORE /:city) ────────────────
+  router.get("/stylists", (_req, res, next) => {
+    void (async () => {
+      const salon = await loadSalon();
+      if (!salon) return next();
+      const team = (await listTeam(db, anchor)) as {
+        displayName?: string;
+        entity?: { title?: string; bio?: string; roles?: string[] };
+      }[];
+      const cards = team
+        .map((t) => {
+          const bio = t.entity?.bio ? `<p class="note" style="margin-top:8px">${esc(t.entity.bio)}</p>` : "";
+          return `<section class="panel">
+  <p class="kicker">${esc(t.entity?.title ?? "")}</p>
+  <h2>${esc(t.displayName ?? "")}</h2>
+  ${bio}
+</section>`;
+        })
+        .join("");
+      const body = `
+<section>
+  <p class="kicker">the artists</p>
+  <h1>The team at ${esc(String(salon.displayName ?? ""))}</h1>
+  <p class="sub">${esc((salon.entity?.stylistLevels as string) ?? "")}</p>
+</section>
+<div class="grid">${cards}</div>
+${ctaRow(salon, origin)}`;
+      res.setHeader("content-type", "text/html; charset=utf-8");
+      res.send(
+        pageShell({
+          campaign,
+          origin,
+          meta: {
+            title: "Stylists & Artists",
+            description: `Meet the team at ${salon.entity?.nap?.name ?? ""} — master stylists, colorists, and artists on Park Avenue, ${salon.entity?.nap?.city ?? ""} FL.`,
+            path: "/stylists",
+            jsonLd: [
+              breadcrumbsJsonLd(
+                [
+                  { name: "Home", path: "/" },
+                  { name: "Stylists", path: "/stylists" },
+                ],
+                origin,
+              ),
+            ],
+          },
+          body,
+          footerLines: footerLines(salon),
+        }),
+      );
+    })().catch(next);
+  });
+
+  // ── GET /book — the conversion surface ───────────────────────────────────
+  router.get("/book", (_req, res, next) => {
+    void (async () => {
+      const salon = await loadSalon();
+      if (!salon) return next();
+      const e = salon.entity ?? {};
+      const body = `
+<section>
+  <p class="kicker">reserve your visit</p>
+  <h1>Book at ${esc(String(salon.displayName ?? ""))}</h1>
+  <p class="sub">Pick a service, an artist, and a time that suits you — online via Phorest, or by call or text. Every visit starts with a consultation.</p>
+</section>
+${ctaRow(salon, origin)}
+<div class="grid">
+  <section class="panel">
+    <p class="kicker">hours</p>
+    ${hoursTable(salon)}
+  </section>
+  <section class="panel">
+    <p class="kicker">find us</p>
+    <p style="font-size:14.5px">${esc(e.nap?.street ?? "")}, ${esc(e.nap?.city ?? "")}, ${esc(e.nap?.region ?? "")} ${esc(e.nap?.postal ?? "")}</p>
+    <p class="note" style="margin-top:6px">${esc(e.locationNotes ?? "")}</p>
+  </section>
+</div>
+<p class="note">${esc(e.serviceInclusions ?? "")}</p>`;
+      res.setHeader("content-type", "text/html; charset=utf-8");
+      res.send(
+        pageShell({
+          campaign,
+          origin,
+          meta: {
+            title: "Book an Appointment",
+            description: `Book at ${e.nap?.name ?? ""} — online via Phorest, call ${e.nap?.phone ?? ""}, or text ${e.textLine ?? ""}. ${e.nap?.city ?? ""}, FL.`,
+            path: "/book",
+            jsonLd: [
+              breadcrumbsJsonLd(
+                [
+                  { name: "Home", path: "/" },
+                  { name: "Book", path: "/book" },
+                ],
+                origin,
+              ),
+            ],
+          },
+          body,
+          footerLines: footerLines(salon),
+        }),
+      );
+    })().catch(next);
+  });
+
+  // ── GET /reviews — attributed social proof, never synthetic ──────────────
+  router.get("/reviews", (_req, res, next) => {
+    void (async () => {
+      const salon = await loadSalon();
+      if (!salon) return next();
+      const e = salon.entity ?? {};
+      const g = e.gbp ?? {};
+      const mapsLink = g.mapsUrl
+        ? `<a class="btn ghost" href="${esc(String(g.mapsUrl))}" rel="noopener noreferrer">Read our reviews on Google</a>`
+        : "";
+      const body = `
+<section>
+  <p class="kicker">what they're saying</p>
+  <h1>Fifteen years of trust, five years on Park Avenue</h1>
+  ${gbpLine(salon)}
+  <p class="sub">We don't publish reviews we can't prove. Every rating above lives on Google, written by real guests — read them at the source.</p>
+</section>
+<section class="panel">
+  <p class="quote">“${esc(e.positioning?.tagline ?? "")}”</p>
+</section>
+<div class="cta-row">${mapsLink}</div>
+${ctaRow(salon, origin)}`;
+      res.setHeader("content-type", "text/html; charset=utf-8");
+      res.send(
+        pageShell({
+          campaign,
+          origin,
+          meta: {
+            title: "Reviews",
+            description: `${e.nap?.name ?? ""} — rated ${g.rating ?? ""} from ${g.reviewCount ?? ""} reviews on Google. Read real guest reviews at the source.`,
+            path: "/reviews",
+            jsonLd: [
+              breadcrumbsJsonLd(
+                [
+                  { name: "Home", path: "/" },
+                  { name: "Reviews", path: "/reviews" },
+                ],
+                origin,
+              ),
+            ],
+          },
+          body,
+          footerLines: footerLines(salon),
+        }),
+      );
+    })().catch(next);
+  });
+
   // ── GET /:city — HELD to the anchor's own city (minimum-content bar) ─────
   router.get("/:city", (req, res, next) => {
     void (async () => {

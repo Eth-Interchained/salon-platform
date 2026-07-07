@@ -27,11 +27,17 @@ salon-near-me.com       → :3203   (SALON_CAMPAIGN=directory)
 ```bash
 cd ~ && git clone https://github.com/Eth-Interchained/salon-platform.git
 cd salon-platform
-npm ci
+npm ci                               # pnpm install works too — npm lockfile is canonical
 npm run build                        # ONE build serves all three
 
 # per-campaign env: fill REPLACE_ME (NEDB_TOKEN, SALON_ADMIN_TOKEN)
 $EDITOR deploy/orlando.env deploy/national.env deploy/directory.env
+
+# SEED — one run serves all three storefronts (shared database).
+# Content-addressed + idempotent: re-running an unchanged seed writes 0.
+# Ends with a verify() gate; expect "✓ verify ok — tamper-evident".
+set -a; . deploy/orlando.env; set +a
+npm run seed
 
 # systemd (adjust WorkingDirectory/EnvironmentFile paths if not /root)
 sudo cp deploy/systemd/salon-*.service /etc/systemd/system/
@@ -59,9 +65,15 @@ curl -s localhost:3202/sitemap.xml         # honest skeleton — homepage only
 ```bash
 cd ~/salon-platform && git pull origin main
 npm ci && npm run build
+set -a; . deploy/orlando.env; set +a
+npm run seed                         # no-op unless seed files changed
 sudo systemctl restart salon-orlando salon-national salon-directory
 for p in 3201 3202 3203; do curl -sf localhost:$p/api/health >/dev/null && echo ":$p ok"; done
 ```
+
+**pnpm shops / nvm installs**: the systemd units call `/usr/bin/env npm run start` —
+if npm isn't on root's system PATH, swap in `pnpm` or an absolute node path in
+the three unit files (`status=203/EXEC` in journalctl is that exact tell).
 
 ## Rollback
 

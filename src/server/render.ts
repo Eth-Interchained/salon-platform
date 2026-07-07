@@ -80,7 +80,7 @@ export async function sitemapUrls(
   if (!anchor) return urls;
   const salon = (await getIdentityByHandle(db, anchor)) as { cityId?: string | null } | null;
   if (!salon) return urls; // unseeded engine → homepage only
-  urls.push(`${origin}/services`);
+  urls.push(`${origin}/services`, `${origin}/stylists`, `${origin}/reviews`, `${origin}/book`);
   const menus = await listServiceMenus(db, anchor);
   for (const m of menus) {
     urls.push(`${origin}/services/${String(m.category)}`);

@@ -190,6 +190,20 @@ test("orlando surfaces: server-rendered pages from real engine data", async () =
   assert.ok(colorHtml.includes("180-260+"), "real price range");
   assert.ok(colorHtml.includes(`"@type":"BreadcrumbList"`), "breadcrumbs JSON-LD");
 
+  // every nav destination renders — nav must never point at an unbuilt room
+  for (const path of ["/stylists", "/reviews", "/book"]) {
+    const r = await fetch(`${base}${path}`);
+    assert.equal(r.status, 200, `${path} renders`);
+  }
+  const stylists = await fetch(`${base}/stylists`).then((r) => r.text());
+  assert.ok(stylists.includes("Sonia Taylor"), "roster renders on /stylists");
+  assert.ok(stylists.includes("Master Stylist / Master Colorist"), "canonical titles render");
+  const book = await fetch(`${base}/book`).then((r) => r.text());
+  assert.ok(book.includes("/go/booking_click?to="), "booking CTAs tracked on /book");
+  const reviews = await fetch(`${base}/reviews`).then((r) => r.text());
+  assert.ok(reviews.includes("196 reviews on Google"), "attributed rating on /reviews");
+  assert.ok(!reviews.includes("aggregateRating"), "no synthetic schema on /reviews");
+
   // city gating: the anchor's own city renders; others are HELD (404 → shell 503 in test env)
   const wp = await fetch(`${base}/winter-park`);
   assert.equal(wp.status, 200, "winter-park (anchor city) renders");
