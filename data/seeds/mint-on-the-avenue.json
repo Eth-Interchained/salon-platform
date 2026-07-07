@@ -48,7 +48,8 @@
       ],
       "priceRange": "$$-$$$",
       "bookingPlatform": "Phorest",
-      "bookingUrl": "TO_CONFIRM — 'Book Now via Phorest' target URL not captured from static HTML",
+      "bookingUrl": "https://www.phorest.com/salon/mintontheavenue",
+      "$bookingNote": "Confirmed by Mark 2026-07-07 — the canonical Phorest booking page. mintontheavenue.com/request-appointment is being phased out.",
       "gbp": {
         "listedName": "Mint On The Avenue Aveda Salon",
         "placeId": "ChIJQfwznhBw54gRZHRHaFdWJxA",
@@ -229,7 +230,6 @@
   ],
 
   "toConfirmWithMark": [
-    "Exact Phorest booking URL (Book Now target)",
     "Social links (Instagram/Facebook) — not present in crawled static HTML",
     "Canonical text number (833 vs 830 — 833 presumed, matches homepage + blog)",
     "Canonical price source (service pages vs homepage widget)",

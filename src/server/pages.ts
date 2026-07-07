@@ -36,6 +36,7 @@ interface SalonDoc {
   cityId?: string | null;
   entity?: SalonEntityLike & {
     textLine?: string;
+    bookingUrl?: string;
     positioning?: { tagline?: string; heroLine?: string; philosophy?: string };
     serviceInclusions?: string;
     stylistLevels?: string;
@@ -60,15 +61,17 @@ function track(db: NedbClient, event: Record<string, unknown>): void {
   });
 }
 
-/** Tracked CTA row — every conversion path goes through /go. */
+/** Tracked CTA row — every conversion path goes through /go. The booking
+ *  URL is DATA (entity.bookingUrl from the seed) — a salon without one
+ *  simply doesn't get the button; call/text remain. */
 function ctaRow(salon: SalonDoc, origin: string): string {
   const e = salon.entity ?? {};
   const tel = telHref(e.nap?.phone);
   const sms = smsHref(e.textLine);
-  const book = "https://mintontheavenue.com/request-appointment/";
+  const book = typeof e.bookingUrl === "string" && /^https:\/\//.test(e.bookingUrl) ? e.bookingUrl : null;
   const go = (kind: string, to: string) => `/go/${kind}?to=${encodeURIComponent(to)}`;
   const parts: string[] = [];
-  parts.push(`<a class="btn solid" href="${esc(go("booking_click", book))}">Book an appointment</a>`);
+  if (book) parts.push(`<a class="btn solid" href="${esc(go("booking_click", book))}">Book an appointment</a>`);
   if (sms) parts.push(`<a class="btn ghost" href="${esc(go("text_click", sms))}">Text ${esc(e.textLine ?? "")}</a>`);
   if (tel) parts.push(`<a class="btn ghost" href="${esc(go("call_click", tel))}">Call ${esc(e.nap?.phone ?? "")}</a>`);
   if (e.gbp?.mapsUrl) parts.push(`<a class="chip" href="${esc(go("direction_click", e.gbp.mapsUrl))}">Directions</a>`);

@@ -180,6 +180,10 @@ test("orlando surfaces: server-rendered pages from real engine data", async () =
   assert.ok(!homeHtml.includes("aggregateRating"), "no self-marked-up Google rating");
   assert.ok(homeHtml.includes(`<meta name="description"`), "meta description present");
   assert.ok(homeHtml.includes("/go/booking_click?to="), "booking CTA is click-tracked");
+  assert.ok(
+    homeHtml.includes(encodeURIComponent("https://www.phorest.com/salon/mintontheavenue")),
+    "booking CTA targets the canonical Phorest page (data-driven from the seed)",
+  );
   assert.ok(homeHtml.includes("Sonia Taylor"), "canonical roster renders");
 
   // service category page — real price table
