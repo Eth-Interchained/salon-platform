@@ -1,0 +1,21 @@
+# Portal Salon Platform — directory storefront
+# Install: cp deploy/systemd/salon-directory.service /etc/systemd/system/
+#          systemctl daemon-reload && systemctl enable --now salon-directory
+
+[Unit]
+Description=Portal Salon Platform — directory (salon-near-me.com :3203)
+After=network.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/root/salon-platform
+EnvironmentFile=/root/salon-platform/deploy/directory.env
+ExecStart=/usr/bin/env npm run start
+Restart=on-failure
+RestartSec=3
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
