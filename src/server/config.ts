@@ -30,6 +30,18 @@ export interface SalonConfig {
   /** AiAS gateway for the content pipeline (Phase 3) — optional. */
   aiassistBaseUrl: string;
   aiassistApiKey?: string;
+  /** WP Portal Bridge — optional. When both are set, the source WordPress
+   *  site's FULL snapshot (every route at its earned path, link graph,
+   *  menus) is served by this storefront: entity surfaces win collisions,
+   *  WordPress fills everything else. Same env var names as the plugin's
+   *  own Connect Portal Frontend screen — copy/paste. */
+  wordpressBridgeBaseUrl?: string;
+  wordpressBridgeTmk?: string;
+  /** Canonical posture for WordPress routes (migration primitive):
+   *  "source" (default) — canonicals point at the origin WordPress site,
+   *  which keeps the authority while this domain serves the content;
+   *  "self" — the migration landed, canonicals are this origin + path. */
+  wordpressCanonical: "source" | "self";
 }
 
 export function loadConfig(env: NodeJS.ProcessEnv = process.env): SalonConfig {
@@ -48,6 +60,9 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): SalonConfig {
     seedDir: env.SEED_DIR || "./data/seeds",
     aiassistBaseUrl: env.AIASSIST_BASE_URL || "https://api.aiassist.net",
     aiassistApiKey: env.AIASSIST_API_KEY || undefined,
+    wordpressBridgeBaseUrl: env.PORTAL_BRIDGE_BASE_URL || undefined,
+    wordpressBridgeTmk: env.PORTAL_TMK || undefined,
+    wordpressCanonical: env.PORTAL_BRIDGE_CANONICAL === "self" ? "self" : "source",
   };
 }
 
@@ -69,6 +84,17 @@ export function validateConfig(
   }
   if (!Number.isFinite(c.port) || c.port <= 0) {
     problems.push(`SALON_API_PORT is not a valid port: ${String(c.port)}`);
+  }
+  if (Boolean(c.wordpressBridgeBaseUrl) !== Boolean(c.wordpressBridgeTmk)) {
+    problems.push(
+      "PORTAL_BRIDGE_BASE_URL and PORTAL_TMK must both be set or both be unset — the bridge is half-configured",
+    );
+  }
+  const posture = env.PORTAL_BRIDGE_CANONICAL;
+  if (posture && posture !== "source" && posture !== "self") {
+    problems.push(
+      `PORTAL_BRIDGE_CANONICAL must be "source" or "self", got "${posture}"`,
+    );
   }
   return problems;
 }

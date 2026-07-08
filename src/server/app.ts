@@ -22,6 +22,7 @@ import type { NedbClient } from "nedb-engine-client";
 import type { SalonConfig } from "./config";
 import { createDb } from "./db";
 import { createRenderRouter } from "./render";
+import { createWordPressSource } from "./wordpress";
 
 export interface AppHandle {
   app: Express;
@@ -85,11 +86,27 @@ export function createApp(cfg: SalonConfig): AppHandle {
     res.json(publicConfig(cfg));
   });
 
+  // ── WordPress bridge source (optional) ────────────────────────────────────
+  // Snapshot-first: boot readiness is best-effort — a stored snapshot in
+  // NEDB boots even with WordPress down; nothing stored + WordPress down
+  // logs loud and retries lazily. The storefront NEVER dies over the bridge.
+  const wpSource = createWordPressSource(cfg);
+  if (wpSource) {
+    console.log(
+      `\x1b[36m[wp-bridge]\x1b[0m configured: ${cfg.wordpressBridgeBaseUrl} (canonical posture: ${cfg.wordpressCanonical})`,
+    );
+    void wpSource.ready().catch((err) => {
+      console.warn(
+        `\x1b[33m[wp-bridge] not ready at boot (${err instanceof Error ? err.message : String(err)}) — will retry on demand\x1b[0m`,
+      );
+    });
+  }
+
   // ── Public render router — server-rendered surfaces (spec §7) ────────────
   // Mounted BEFORE static so config-driven robots/sitemap can never be
   // shadowed by a stray file in dist. NOTE: for anchor-salon campaigns the
   // router owns "/" — the SPA shell serves interactive surfaces only.
-  app.use(createRenderRouter(cfg, db));
+  app.use(createRenderRouter(cfg, db, wpSource));
 
   // ── SPA shell (production build) ──────────────────────────────────────────
   // Runtime campaign injection: ONE build serves every storefront, so the

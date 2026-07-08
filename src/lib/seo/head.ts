@@ -2,8 +2,12 @@
  * Head builder — every server-rendered page's <head> from one function.
  *
  * Canonical discipline is structural (spec §8): the canonical URL is
- * built from the owning campaign's origin, period. Cross-domain
- * duplication cannot be expressed through this builder.
+ * built from the owning campaign's origin. ONE deliberate exception
+ * (decision 2026-07-08): WordPress-bridge routes in migration posture
+ * carry the SOURCE site's earned canonical via canonicalUrl — the new
+ * domain serves the content, the origin WordPress keeps the authority,
+ * until the migration flips the posture to self-canonical. Nothing else
+ * may set canonicalUrl; campaign pages remain origin + path, period.
  */
 
 import type { CampaignDefinition } from "../campaign";
@@ -14,6 +18,9 @@ export interface PageMeta {
   description: string;
   /** Absolute path starting with "/" — canonical = origin + path. */
   path: string;
+  /** ABSOLUTE canonical override — WordPress-bridge migration posture
+   *  only (canonical-to-source). Leave unset everywhere else. */
+  canonicalUrl?: string;
   /** JSON-LD objects, rendered as script tags in order. */
   jsonLd?: object[];
   /** Explicit robots directive (e.g. held pages). Absent = indexable. */
@@ -39,7 +46,7 @@ export function buildHead(
   origin: string,
 ): string {
   const title = pageTitle(meta, campaign);
-  const canonical = `${origin}${meta.path}`;
+  const canonical = meta.canonicalUrl ?? `${origin}${meta.path}`;
   const parts: string[] = [
     `<meta charset="utf-8">`,
     `<meta name="viewport" content="width=device-width, initial-scale=1.0">`,

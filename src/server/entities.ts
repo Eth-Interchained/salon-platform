@@ -144,3 +144,8 @@ export async function getCity(
 ): Promise<Record<string, unknown> | null> {
   return db.get(COLLECTIONS.cities, slug);
 }
+
+// (WordPress content is NOT copied into per-post documents here — the full
+// site snapshot, with every route at its earned path and the complete link
+// graph, lives in NEDB via the bridge's own NedbSnapshotStore. See
+// src/server/wordpress.ts — the snapshot is the contract.)
