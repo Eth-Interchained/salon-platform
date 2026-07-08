@@ -30,6 +30,12 @@ export interface SalonConfig {
   /** AiAS gateway for the content pipeline (Phase 3) — optional. */
   aiassistBaseUrl: string;
   aiassistApiKey?: string;
+  /** WP Portal Bridge — optional. When both are set, this campaign's /blog
+   *  surface is populated by scripts/sync-wordpress.ts and served from a
+   *  real WordPress site instead of staying unbuilt. Same env var names as
+   *  the bridge plugin's own Connect Portal Frontend screen — copy/paste. */
+  wordpressBridgeBaseUrl?: string;
+  wordpressBridgeTmk?: string;
 }
 
 export function loadConfig(env: NodeJS.ProcessEnv = process.env): SalonConfig {
@@ -48,6 +54,8 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): SalonConfig {
     seedDir: env.SEED_DIR || "./data/seeds",
     aiassistBaseUrl: env.AIASSIST_BASE_URL || "https://api.aiassist.net",
     aiassistApiKey: env.AIASSIST_API_KEY || undefined,
+    wordpressBridgeBaseUrl: env.PORTAL_BRIDGE_BASE_URL || undefined,
+    wordpressBridgeTmk: env.PORTAL_TMK || undefined,
   };
 }
 
@@ -69,6 +77,11 @@ export function validateConfig(
   }
   if (!Number.isFinite(c.port) || c.port <= 0) {
     problems.push(`SALON_API_PORT is not a valid port: ${String(c.port)}`);
+  }
+  if (Boolean(c.wordpressBridgeBaseUrl) !== Boolean(c.wordpressBridgeTmk)) {
+    problems.push(
+      "PORTAL_BRIDGE_BASE_URL and PORTAL_TMK must both be set or both be unset — the bridge is half-configured",
+    );
   }
   return problems;
 }

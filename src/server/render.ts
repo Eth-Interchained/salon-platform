@@ -17,7 +17,8 @@ import type { NedbClient } from "nedb-engine-client";
 
 import type { CampaignDefinition } from "../lib/campaign";
 import type { SalonConfig } from "./config";
-import { getIdentityByHandle, listServiceMenus } from "./entities";
+import { getIdentityByHandle, listArticles, listServiceMenus } from "./entities";
+import { createArticlesRouter } from "./articles";
 import { createPagesRouter } from "./pages";
 
 /** The absolute origin every public URL is built from. */
@@ -76,10 +77,20 @@ export async function sitemapUrls(
   db: NedbClient,
 ): Promise<string[]> {
   const urls = [`${origin}/`];
+
+  // Articles are campaign-scoped, not anchor-salon-scoped — a directory or
+  // national campaign with no anchor salon at all can still have a journal.
+  // Computed before any anchor-salon early return so it's never skipped.
+  const articles = await listArticles(db, campaign.id);
+  if (articles.length > 0) {
+    urls.push(`${origin}/blog`);
+    for (const a of articles) urls.push(`${origin}/blog/${a.slug}`);
+  }
+
   const anchor = campaign.anchorSalonHandle;
   if (!anchor) return urls;
   const salon = (await getIdentityByHandle(db, anchor)) as { cityId?: string | null } | null;
-  if (!salon) return urls; // unseeded engine → homepage only
+  if (!salon) return urls; // unseeded engine → homepage (+ articles) only
   urls.push(`${origin}/services`, `${origin}/stylists`, `${origin}/reviews`, `${origin}/book`);
   const menus = await listServiceMenus(db, anchor);
   for (const m of menus) {
@@ -109,6 +120,10 @@ export function createRenderRouter(cfg: SalonConfig, db: NedbClient): Router {
       res.send(buildSitemap(urls));
     })().catch(next);
   });
+
+  // Journal/blog — WordPress-sourced when synced, otherwise the collection
+  // is empty and every route falls through to the SPA shell (next()).
+  router.use(createArticlesRouter(campaign, db, origin));
 
   // Salon surfaces — mounted only when the campaign anchors on a salon.
   router.use(createPagesRouter(cfg, campaign, db, origin));

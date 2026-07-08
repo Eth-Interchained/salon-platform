@@ -13,6 +13,7 @@
  * wrap them yet (queued upstream; the flagship feeds the library).
  */
 
+import { createHash } from "node:crypto";
 import { z } from "zod";
 import type { NedbClient } from "nedb-engine-client";
 
@@ -23,6 +24,7 @@ export const COLLECTIONS = {
   services: "services",
   seedRuns: "seed_runs",
   events: "events",
+  articles: "articles",
 } as const;
 
 // ── Seed-file schemas (data/seeds/*.json — salon.template.json shape) ───────
@@ -143,4 +145,50 @@ export async function getCity(
   slug: string,
 ): Promise<Record<string, unknown> | null> {
   return db.get(COLLECTIONS.cities, slug);
+}
+
+// ── Articles (WordPress-sourced editorial content — see wordpress-sync.ts) ──
+
+export interface ArticleDoc {
+  slug: string;
+  campaignId: string;
+  title: string;
+  excerpt: string;
+  html: string;
+  seo: {
+    title: string;
+    description: string;
+    canonical: string;
+    robots: string[];
+  };
+  publishedAt: string;
+  modifiedAt: string;
+  sourceWpId: string;
+}
+
+/** Deterministic, immutable article id from campaign + slug — same pattern
+ *  as identityId(), so re-syncing the same WordPress post is a true update
+ *  to the same document, never a duplicate. */
+export function articleId(campaignId: string, slug: string): string {
+  return `art_${createHash("sha256").update(`${campaignId}:${slug}`).digest("hex").slice(0, 20)}`;
+}
+
+export async function listArticles(
+  db: NedbClient,
+  campaignId: string,
+): Promise<ArticleDoc[]> {
+  const rows = await db.query(
+    `FROM ${COLLECTIONS.articles} WHERE campaignId = "${campaignId}" ORDER BY publishedAt DESC`,
+  );
+  return rows as unknown as ArticleDoc[];
+}
+
+export async function getArticleBySlug(
+  db: NedbClient,
+  campaignId: string,
+  slug: string,
+): Promise<ArticleDoc | null> {
+  const id = articleId(campaignId, slug);
+  const doc = await db.get(COLLECTIONS.articles, id);
+  return doc ? (doc as unknown as ArticleDoc) : null;
 }
