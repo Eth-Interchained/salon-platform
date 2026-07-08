@@ -15,11 +15,13 @@
 import { Router } from "express";
 import type { NedbClient } from "nedb-engine-client";
 
+import type { WordPressBridgeSource } from "@interchained/portal-source-wordpress";
+
 import type { CampaignDefinition } from "../lib/campaign";
 import type { SalonConfig } from "./config";
-import { getIdentityByHandle, listArticles, listServiceMenus } from "./entities";
-import { createArticlesRouter } from "./articles";
+import { getIdentityByHandle, listServiceMenus } from "./entities";
 import { createPagesRouter } from "./pages";
+import { createWordPressRouter, wordpressSitemapUrls } from "./wordpress";
 
 /** The absolute origin every public URL is built from. */
 export function campaignOrigin(cfg: Pick<SalonConfig, "publicOrigin">, campaign: CampaignDefinition): string {
@@ -75,17 +77,16 @@ export async function sitemapUrls(
   campaign: CampaignDefinition,
   origin: string,
   db: NedbClient,
+  wpSource: WordPressBridgeSource | null = null,
+  wpPosture: "source" | "self" = "source",
 ): Promise<string[]> {
   const urls = [`${origin}/`];
 
-  // Articles are campaign-scoped, not anchor-salon-scoped — a directory or
-  // national campaign with no anchor salon at all can still have a journal.
-  // Computed before any anchor-salon early return so it's never skipped.
-  const articles = await listArticles(db, campaign.id);
-  if (articles.length > 0) {
-    urls.push(`${origin}/blog`);
-    for (const a of articles) urls.push(`${origin}/blog/${a.slug}`);
-  }
+  // WordPress routes join the sitemap ONLY in self posture — in source
+  // posture their canonicals point at the origin WordPress site, and a
+  // sitemap must list canonical URLs (spec §8 honesty, migration decision
+  // 2026-07-08). Computed before any anchor-salon early return.
+  urls.push(...wordpressSitemapUrls(wpSource, origin, wpPosture));
 
   const anchor = campaign.anchorSalonHandle;
   if (!anchor) return urls;
@@ -100,7 +101,11 @@ export async function sitemapUrls(
   return urls;
 }
 
-export function createRenderRouter(cfg: SalonConfig, db: NedbClient): Router {
+export function createRenderRouter(
+  cfg: SalonConfig,
+  db: NedbClient,
+  wpSource: WordPressBridgeSource | null = null,
+): Router {
   const campaign = cfg.campaign;
   if (!campaign) {
     throw new Error("createRenderRouter: cfg.campaign is null");
@@ -115,18 +120,23 @@ export function createRenderRouter(cfg: SalonConfig, db: NedbClient): Router {
 
   router.get("/sitemap.xml", (_req, res, next) => {
     void (async () => {
-      const urls = await sitemapUrls(campaign, origin, db);
+      const urls = await sitemapUrls(campaign, origin, db, wpSource, cfg.wordpressCanonical);
       res.setHeader("content-type", "application/xml; charset=utf-8");
       res.send(buildSitemap(urls));
     })().catch(next);
   });
 
-  // Journal/blog — WordPress-sourced when synced, otherwise the collection
-  // is empty and every route falls through to the SPA shell (next()).
-  router.use(createArticlesRouter(campaign, db, origin));
-
-  // Salon surfaces — mounted only when the campaign anchors on a salon.
+  // Salon surfaces FIRST — entity surfaces win collisions (decision
+  // 2026-07-08): /services, /stylists, /book, cities, and the home always
+  // belong to the platform.
   router.use(createPagesRouter(cfg, campaign, db, origin));
+
+  // WordPress snapshot AFTER — every route the platform didn't claim
+  // renders at WordPress's earned path, in this storefront's theme.
+  // Misses fall through to the SPA shell.
+  if (wpSource) {
+    router.use(createWordPressRouter(campaign, wpSource, origin, cfg.wordpressCanonical));
+  }
 
   return router;
 }

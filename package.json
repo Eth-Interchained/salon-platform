@@ -15,9 +15,8 @@
     "audit": "portal audit",
     "guard": "portal guard",
     "seed": "tsx scripts/seed.ts",
-    "sync:wordpress": "tsx scripts/sync-wordpress.ts",
     "typecheck": "tsc --noEmit",
-    "test": "tsx --test test/campaign.test.ts test/config.test.ts test/render.test.ts test/seed.test.ts test/seo.test.ts test/wordpress-sync.test.ts",
+    "test": "tsx --test test/campaign.test.ts test/config.test.ts test/render.test.ts test/seed.test.ts test/seo.test.ts test/wordpress.test.ts",
     "test:api": "tsx --test test/api.test.ts"
   },
   "dependencies": {
